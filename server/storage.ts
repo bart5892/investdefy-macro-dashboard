@@ -6,6 +6,12 @@ import { marketData, parameters, type MarketData, type Parameter, type InsertMar
 // Support DATABASE_URL=file:/path/to/db or plain path
 const rawDbUrl = process.env.DATABASE_URL || "data.db";
 const dbPath = rawDbUrl.startsWith("file:") ? rawDbUrl.slice(5) : rawDbUrl;
+
+// Ensure parent directory exists
+import { mkdirSync } from "fs";
+import { dirname } from "path";
+try { mkdirSync(dirname(dbPath), { recursive: true }); } catch (_) {}
+
 const sqlite = new Database(dbPath);
 sqlite.pragma("journal_mode = WAL");
 const db = drizzle(sqlite);

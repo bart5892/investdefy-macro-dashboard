@@ -1,20 +1,21 @@
 #!/bin/bash
 # InvestDEFY Macro Signal Dashboard — startup script
-set -e
 
 echo "=== InvestDEFY Macro Signal Dashboard ==="
+echo "Node: $(node --version)"
+echo "Python: $(python3 --version 2>&1)"
+echo "PORT: ${PORT:-5000}"
+echo "DATABASE_URL: ${DATABASE_URL:-not set, using data.db}"
 
-# Install Python dependencies (try pip3, pip, python -m pip)
-if ! python3 -c "import yfinance" 2>/dev/null; then
-  echo "Installing Python dependencies..."
-  if command -v pip3 &>/dev/null; then
-    pip3 install -r requirements.txt --quiet
-  elif command -v pip &>/dev/null; then
-    pip install -r requirements.txt --quiet
-  else
-    python3 -m pip install -r requirements.txt --quiet
-  fi
-fi
+# Ensure data directory exists for SQLite
+mkdir -p /app/data 2>/dev/null || mkdir -p ./data 2>/dev/null || true
 
-echo "Starting server on port ${PORT:-5000}..."
+# Install Python dependencies
+echo "Installing Python dependencies..."
+python3 -m pip install -r requirements.txt --quiet 2>&1 || echo "WARNING: pip install failed, yfinance may not be available"
+
+echo "Verifying yfinance..."
+python3 -c "import yfinance; print('yfinance OK:', yfinance.__version__)" 2>&1 || echo "WARNING: yfinance not available"
+
+echo "Starting server..."
 exec node dist/index.cjs
