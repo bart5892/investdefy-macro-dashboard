@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+#!/usr/bin/env python
 """
 fetch_yahoo.py — Uses yfinance to fetch Yahoo Finance data.
 Called from Node.js via child_process.

@@ -66,8 +66,10 @@ function fetchYahooPython(
   days: number
 ): Promise<Record<string, { date: string; close: number }[]>> {
   return new Promise((resolve, reject) => {
+    // Try python3 first, fall back to python
+    const pythonCmd = (() => { try { require("child_process").execSync("python3 --version", {stdio:"ignore"}); return "python3"; } catch { return "python"; } })();
     execFile(
-      "python3",
+      pythonCmd,
       [PYTHON_SCRIPT, "history", tickers.join(","), String(days)],
       { timeout: 120000, maxBuffer: 10 * 1024 * 1024 },
       (err, stdout, stderr) => {
